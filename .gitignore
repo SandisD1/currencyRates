@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+!.target/
+>>>>>>> 89d5ebd1a226b2f1957cc29b16485f1cbd43e510
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
