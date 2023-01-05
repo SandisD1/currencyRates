@@ -1,0 +1,8 @@
+app\dto\CurrencyEntry.class
+app\CurrencyService.class
+app\dto\CurrencyOutput.class
+app\util\DatabaseConnection.class
+app\CurrencyController.class
+app\CurrencyRepository.class
+app\Main.class
+app\UpdateCurrencyValuesInDb.class
