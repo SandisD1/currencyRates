@@ -11,7 +11,7 @@
 > Once this command is executed please wait about 2 minutes for the database to initialize and become accessable, before starting the app or updating entries.
 
 >**Note**
-> For the following two (docker create) commands, navigate you command line to the "target" folder, located inside the .../currencyRates/ directory on you computer 
+> For the following two (docker create) commands, navigate you command line to the "target" folder, located inside the cloned .../currencyRates/ directory on you computer 
 ### Enter the following command into you command-line to create a docker image that updates the currency rate values in your mariadb database:
 - docker create --name database-update currency-javalin update
 
