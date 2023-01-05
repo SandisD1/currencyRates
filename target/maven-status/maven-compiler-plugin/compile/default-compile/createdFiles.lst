@@ -5,4 +5,5 @@ app\util\DatabaseConnection.class
 app\CurrencyController.class
 app\CurrencyRepository.class
 app\Main.class
+app\CurrencyValuesInput.class
 app\UpdateCurrencyValuesInDb.class

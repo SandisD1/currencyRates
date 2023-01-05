@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyRepository {
-    private Connection connection;
 
     public CurrencyRepository() {
         super();
@@ -43,6 +42,7 @@ public class CurrencyRepository {
 
             latestRates.add(new CurrencyOutput(formated, code, rate));
         }
+        session.close();
 
         return latestRates;
 
@@ -71,6 +71,7 @@ public class CurrencyRepository {
 
             ratesForRequestedCurrency.add(new CurrencyOutput(formatted, code, rate));
         }
+        session.close();
 
         return ratesForRequestedCurrency;
 
