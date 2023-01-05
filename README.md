@@ -28,3 +28,7 @@
 - Enter http://localhost:7070/latest into your browser to see the latest rates for all currencies.
 - Enter http://localhost:7070/AUD into your browser to see the stored history of rates for the specific currency specified by the three letter currency code at the end of URL.
 
+### To stop your docker images from running:
+- Enter "docker stop currency-database" to stoped the database process.
+- Enter "docker stop javalin-app" to stoped the application process with endpoints.
+- The update image is stoped after execution.
