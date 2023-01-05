@@ -25,6 +25,6 @@
 - docker start javalin-app
 
 ## To access the application Endpoints:
--Enter http://localhost:7070/latest into your browser to see the latest rates for all currencies.
--Enter http://localhost:7070/AUD into your browser to see the stored history of rates for the specific currency specified by the three letter currency code at the end of URL.
+- Enter http://localhost:7070/latest into your browser to see the latest rates for all currencies.
+- Enter http://localhost:7070/AUD into your browser to see the stored history of rates for the specific currency specified by the three letter currency code at the end of URL.
 
