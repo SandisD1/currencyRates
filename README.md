@@ -4,7 +4,7 @@
 
 ### Clone the project repository to your device. Click on the clone button on the top-right and copy the link presented. Enter the following command with the cloned link in your command line, navigated to the directory of your choice:
 
-- git clone https://gitfront.io/r/user-3510169/XCwAq3238u5X/currencyRates.git
+- git clone https://gitfront.io/r/Sandis-Dreimanis/SyixGnkA2UpZ/currencyRates.git
 
 ### Enter the following command into you command-line to create a docker image for the mariaDB database that is used in this project:
 
