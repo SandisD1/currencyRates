@@ -7,87 +7,81 @@ import java.sql.*;
 import java.util.List;
 
 public class UpdateCurrencyValuesInDb {
+
     public static void update() {
 
-        try {
-            Connection dbConnection = DatabaseConnection.getConnection();
+        String url = "https://www.bank.lv/vk/ecb_rss.xml";
 
-            createCurrencyTableIfNotExists(dbConnection);
+        try (Connection connection = DatabaseConnection.getConnection()) {
 
-            String url = "https://www.bank.lv/vk/ecb_rss.xml";
+            createCurrencyTableIfNotExists(connection);
 
             List<CurrencyEntry> currencyEntries = CurrencyValuesInput.readCurrencyValues(url);
 
-            insertRates(currencyEntries, dbConnection);
-
-            dbConnection.close();
-
-            System.out.println("Currency Rates Updated");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void createCurrencyTableIfNotExists(Connection conn) {
-
-        try {
-
-            Statement stmt = conn.createStatement();
-
-            String sql2 = "CREATE TABLE IF NOT EXISTS currency\n" +
-                    "(\n" +
-                    "    entry_id      serial PRIMARY KEY,\n" +
-                    "    entry_date    timestamp NOT NULL,\n" +
-                    "    currency_code text      NOT NULL,\n" +
-                    "    currency_rate text      NOT NULL,\n" +
-                    "    timezone      text      NOT NULL\n" +
-                    ");";
-
-            stmt.execute(sql2);
-            stmt.close();
-            conn.commit();
+            insertRates(currencyEntries, connection);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
+        System.out.println("Currency Rates Updated");
     }
 
-    public static boolean isDuplicateEntry(CurrencyEntry entry, Connection connection) {
+    private static void createCurrencyTableIfNotExists(Connection connection) throws SQLException {
 
-        try {
-            String sqlReq = "Select * from currency c where c.currency_code=? && c.entry_date=?";
-            PreparedStatement pstmt = connection.prepareStatement(sqlReq);
-            pstmt.setString(1, entry.getCurrencyCode());
-            pstmt.setTimestamp(2, entry.getEntryDate());
-            ResultSet rs = pstmt.executeQuery();
+        Statement statement = connection.createStatement();
 
-            boolean isDuplicate = rs.next();
-            rs.close();
-            return isDuplicate;
+        String createTable = "CREATE TABLE IF NOT EXISTS currency\n" +
+                "(\n" +
+                "    entry_id      serial PRIMARY KEY,\n" +
+                "    entry_date    timestamp NOT NULL,\n" +
+                "    currency_code text      NOT NULL,\n" +
+                "    currency_rate text      NOT NULL,\n" +
+                "    timezone      text      NOT NULL\n" +
+                ");";
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        statement.execute(createTable);
+        statement.close();
+
+        connection.commit();
+
     }
 
-    public static void insertRates(List<CurrencyEntry> entries, Connection connection) {
+    private static boolean isDuplicateEntry(CurrencyEntry entry, Connection connection) throws SQLException {
 
-        try {
-            for (CurrencyEntry entry : entries) {
-                if (!isDuplicateEntry(entry, connection)) {
+        String sqlQuery = "Select * from currency c where c.currency_code=? && c.entry_date=?";
 
-                    Statement stmt = connection.createStatement();
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
 
-                    String sql = "INSERT INTO currency (entry_date,currency_code,currency_rate,timezone)" + "VALUES ('" + entry.getEntryDate() + "', '" + entry.getCurrencyCode() + "', '" + entry.getCurrencyRate() + "', '" + entry.getTimezone() + "');";
+        preparedStatement.setString(1, entry.getCurrencyCode());
+        preparedStatement.setTimestamp(2, entry.getEntryDate());
 
-                    stmt.execute(sql);
-                    stmt.close();
-                    connection.commit();
-                }
+        ResultSet resultSet = preparedStatement.executeQuery();
+        preparedStatement.close();
+
+        boolean isDuplicate = resultSet.next();
+
+        resultSet.close();
+        return isDuplicate;
+
+
+    }
+
+    private static void insertRates(List<CurrencyEntry> entries, Connection connection) throws SQLException {
+
+        for (CurrencyEntry entry : entries) {
+            if (!isDuplicateEntry(entry, connection)) {
+                Statement insertStatement = connection.createStatement();
+
+                String sql = "INSERT INTO currency (entry_date,currency_code,currency_rate,timezone)" +
+                        "VALUES ('" + entry.getEntryDate() + "', '" + entry.getCurrencyCode() + "', '" +
+                        entry.getCurrencyRate() + "', '" + entry.getTimezone() + "');";
+
+                insertStatement.execute(sql);
+                insertStatement.close();
+                connection.commit();
+
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 }

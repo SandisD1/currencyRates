@@ -2,7 +2,6 @@ package app;
 
 import app.dto.CurrencyOutput;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class CurrencyService {
@@ -12,11 +11,13 @@ public class CurrencyService {
         this.currencyRepository = new CurrencyRepository();
     }
 
-    public List<CurrencyOutput> getLatestRates() throws SQLException {
+    public List<CurrencyOutput> getLatestRates() {
+
         return this.currencyRepository.getLatestRates();
     }
 
-    public List<CurrencyOutput> getRatesForRequestedCurrency(String currencyCode) throws SQLException {
+    public List<CurrencyOutput> getRatesForRequestedCurrency(String currencyCode) {
+
         return this.currencyRepository.getRatesForRequestedCurrency(currencyCode.toUpperCase());
     }
 

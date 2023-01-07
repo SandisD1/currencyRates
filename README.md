@@ -2,6 +2,10 @@
 
 ## Setup:
 
+### Clone the project repository to your device. Click on the clone button on the top-right and copy the link presented. Enter the following command with the cloned link in your command line, navigated to the directory of your choice:
+
+- git clone https://gitfront.io/r/user-3510169/XCwAq3238u5X/currencyRates.git
+
 ### Enter the following command into you command-line to create a docker image for the mariaDB database that is used in this project:
 
 - docker create -p 3306:3306 --name currency-database -e MARIADB_USER=example-user -e MARIADB_PASSWORD=my_cool_secret -e
@@ -32,9 +36,6 @@
 
 - docker build -t currency-javalin .
 
-> **Note**
-> For the following two (docker create) commands, navigate you command line to the "target" folder, located inside the
-> cloned .../currencyRates/ directory on you computer
 
 ### Enter the following command into you command-line to create a docker container that updates the currency rate values in your mariadb database:
 
@@ -62,4 +63,4 @@
 
 - Enter "docker stop currency-database" to stop the database process.
 - Enter "docker stop javalin-app" to stop the application process with endpoints.
-- The update image is stop after execution.
+- The update image is stopped after execution.

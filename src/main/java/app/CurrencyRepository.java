@@ -2,12 +2,8 @@ package app;
 
 import app.dto.CurrencyOutput;
 import app.util.DatabaseConnection;
-import org.mariadb.jdbc.Connection;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -21,61 +17,64 @@ public class CurrencyRepository {
         super();
     }
 
-    public List<CurrencyOutput> getLatestRates() throws SQLException {
+    public List<CurrencyOutput> getLatestRates() {
+
         List<CurrencyOutput> latestRates = new ArrayList<>();
-        Connection session = (Connection) DatabaseConnection.getConnection();
-
         String sqlReq = "Select * from currency c where c.entry_date=(Select max(entry_date) from currency c)";
-        PreparedStatement pstmt = session.prepareStatement(sqlReq);
 
-        ResultSet resultSet = pstmt.executeQuery();
+        try (Connection session = DatabaseConnection.getConnection();
+             PreparedStatement queryStatement = session.prepareStatement(sqlReq)) {
 
-        while (resultSet.next()) {
-            Timestamp date = resultSet.getTimestamp("entry_date");
-            String code = resultSet.getString("currency_code");
-            String rate = resultSet.getString("currency_rate");
-            String timezone = resultSet.getString("timezone");
-            ZoneId zoneId = ZoneId.ofOffset("GMT", ZoneOffset.of(timezone));
-            ZonedDateTime entryTime = date.toLocalDateTime().atZone(zoneId);
-
-            String formated = entryTime.format(DateTimeFormatter.RFC_1123_DATE_TIME);
-
-            latestRates.add(new CurrencyOutput(formated, code, rate));
+            fillRetrievedRates(queryStatement, latestRates);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        session.close();
-
         return latestRates;
 
     }
 
-    public List<CurrencyOutput> getRatesForRequestedCurrency(String currencyCode) throws SQLException {
+    public List<CurrencyOutput> getRatesForRequestedCurrency(String currencyCode) {
         List<CurrencyOutput> ratesForRequestedCurrency = new ArrayList<>();
-        Connection session = (Connection) DatabaseConnection.getConnection();
 
         String sqlReq = "Select * from currency c where c.currency_code=?";
-        PreparedStatement pstmt = session.prepareStatement(sqlReq);
-        pstmt.setString(1, currencyCode);
 
-        ResultSet resultSet = pstmt.executeQuery();
+        try (Connection session = DatabaseConnection.getConnection();
+             PreparedStatement queryStatement = session.prepareStatement(sqlReq)) {
 
-        while (resultSet.next()) {
-            Timestamp date = resultSet.getTimestamp("entry_date");
-            String code = resultSet.getString("currency_code");
-            String rate = resultSet.getString("currency_rate");
-            String timezone = resultSet.getString("timezone");
+            queryStatement.setString(1, currencyCode);
 
-            ZoneId zoneId = ZoneId.ofOffset("GMT", ZoneOffset.of(timezone));
-            ZonedDateTime entryTime = date.toLocalDateTime().atZone(zoneId);
+            fillRetrievedRates(queryStatement, ratesForRequestedCurrency);
 
-            String formatted = entryTime.format(DateTimeFormatter.RFC_1123_DATE_TIME);
-
-            ratesForRequestedCurrency.add(new CurrencyOutput(formatted, code, rate));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        session.close();
 
         return ratesForRequestedCurrency;
 
     }
 
+    private void fillRetrievedRates(PreparedStatement preparedStatement, List<CurrencyOutput> outputContainer) {
 
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+
+                Timestamp date = resultSet.getTimestamp("entry_date");
+                String code = resultSet.getString("currency_code");
+                String rate = resultSet.getString("currency_rate");
+                String timezone = resultSet.getString("timezone");
+
+                ZoneId zoneId = ZoneId.ofOffset("GMT", ZoneOffset.of(timezone));
+                ZonedDateTime entryTime = date.toLocalDateTime().atZone(zoneId);
+
+                String formatted = entryTime.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+                outputContainer.add(new CurrencyOutput(formatted, code, rate));
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

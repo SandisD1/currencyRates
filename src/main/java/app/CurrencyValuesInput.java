@@ -48,22 +48,23 @@ public class CurrencyValuesInput {
                 String description = element.getElementsByTagName("description").item(0).getTextContent();
                 String pubDate = element.getElementsByTagName("pubDate").item(0).getTextContent();
 
-                Pattern p = Pattern.compile("[A-Z]{3}\\s[0-9]*\\.[0-9]{8}");
-                Matcher m = p.matcher(description);
-                ZonedDateTime postDate = ZonedDateTime.parse(pubDate, DateTimeFormatter.RFC_1123_DATE_TIME);
-                ZoneId zone = postDate.getZone();
-                String zoneId = zone.toString();
+                Pattern pattern = Pattern.compile("[A-Z]{3}\\s[0-9]*\\.[0-9]{8}");
+                Matcher matcher = pattern.matcher(description);
+                ZonedDateTime postDateTime = ZonedDateTime.parse(pubDate, DateTimeFormatter.RFC_1123_DATE_TIME);
+                ZoneId postZoneId = postDateTime.getZone();
+                String postZoneString = postZoneId.toString();
 
-                Timestamp ts = Timestamp.valueOf(postDate.toLocalDateTime());
+                Timestamp postLocalTimeStamp = Timestamp.valueOf(postDateTime.toLocalDateTime());
 
-                while (m.find()) {
-                    String[] entry = m.group().split(" ");
+                while (matcher.find()) {
+                    String[] entry = matcher.group().split(" ");
 
-                    CurrencyEntry currencyEntry = new CurrencyEntry(ts, entry[0], entry[1], zoneId);
+                    CurrencyEntry currencyEntry = new CurrencyEntry(postLocalTimeStamp, entry[0], entry[1], postZoneString);
 
                     parsedEntries.add(currencyEntry);
 
                 }
+
             }
         }
         return parsedEntries;
